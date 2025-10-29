@@ -36,7 +36,7 @@ export function Contact() {
   }
 
   return (
-    <section id="contact" className="py-24 px-6 bg-gradient-to-b from-white to-slate-50">
+    <section id="contact" className="py-24 px-6 bg-gradient-to-b from-slate-50 via-indigo-50/20 to-white">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center p-2 bg-green-100 rounded-lg mb-4">

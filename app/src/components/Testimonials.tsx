@@ -26,7 +26,7 @@ export function Testimonials() {
   ]
 
   return (
-    <section className="py-24 px-6 bg-gradient-to-b from-slate-50 to-white">
+    <section className="py-24 px-6 bg-gradient-to-b from-white via-purple-50/20 to-slate-50">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center p-2 bg-yellow-100 rounded-lg mb-4">
