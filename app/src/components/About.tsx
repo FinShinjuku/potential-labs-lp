@@ -64,12 +64,12 @@ export function About() {
           <Card className="max-w-2xl mx-auto overflow-hidden hover:shadow-xl transition-shadow">
             <CardContent className="p-0">
               <div className="md:flex">
-                <div className="md:w-2/5 relative h-64 md:h-auto">
+                <div className="md:w-2/5 relative h-96 md:h-auto">
                   <Image
                     src="/images/founder.jpg"
                     alt="Founder"
                     fill
-                    className="object-cover object-top"
+                    className="object-cover object-center"
                     priority
                   />
                 </div>

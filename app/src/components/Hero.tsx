@@ -30,26 +30,26 @@ export function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-5xl mx-auto text-center">
-        <div className="relative h-64 md:h-80 flex items-center justify-center mb-8">
+      <div className="relative z-10 w-full mx-auto text-center px-4">
+        <div className="relative h-64 md:h-96 flex items-center justify-center mb-8">
           <h1
-            className={`absolute inset-0 flex flex-col items-center justify-center text-5xl md:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 transition-opacity duration-1000 ${
+            className={`absolute inset-0 flex items-center justify-center text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 transition-opacity duration-1000 px-6 ${
               showCompanyName ? 'opacity-100' : 'opacity-0'
             }`}
           >
             Potential Labs
           </h1>
           <h1
-            className={`absolute inset-0 flex flex-col items-center justify-center text-5xl md:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 transition-opacity duration-1000 ${
+            className={`absolute inset-0 flex flex-col items-center justify-center text-center text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 transition-opacity duration-1000 px-6 ${
               !showCompanyName ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <span>テクノロジーで、</span>
-            <span>人の可能性をひらく。</span>
+            <span className="whitespace-nowrap">テクノロジーで、</span>
+            <span className="whitespace-nowrap">人の可能性をひらく。</span>
           </h1>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center mb-8">
           <Button
             size="lg"
             className="group px-10 py-7 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
@@ -58,6 +58,22 @@ export function Hero() {
             お問い合わせ
             <ArrowRight className="ml-2 h-6 w-6 transition-transform group-hover:translate-x-1" />
           </Button>
+        </div>
+
+        {/* Trust Indicators */}
+        <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-600 animate-fade-in-up animation-delay-400">
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+            <span>初回相談無料</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+            <span>実績多数</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+            <span>迅速対応</span>
+          </div>
         </div>
       </div>
     </section>
