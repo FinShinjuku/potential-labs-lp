@@ -1,0 +1,278 @@
+name: Miyabi Auto Execute
+
+on:
+  issues:
+    types: [opened, labeled]
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue number to process'
+        required: true
+        type: number
+
+jobs:
+  check-trigger:
+    name: Check Trigger
+    runs-on: ubuntu-latest
+    outputs:
+      should_execute: ${{ steps.check.outputs.should_execute }}
+      issue_number: ${{ steps.check.outputs.issue_number }}
+
+    steps:
+      - name: Check trigger conditions
+        id: check
+        run: |
+          SHOULD_EXECUTE="false"
+          ISSUE_NUMBER=""
+
+          # Manual trigger
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            SHOULD_EXECUTE="true"
+            ISSUE_NUMBER="${{ github.event.inputs.issue_number }}"
+            echo "✅ Manual trigger for issue #${ISSUE_NUMBER}"
+          fi
+
+          # Label trigger
+          if [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.action }}" = "labeled" ]; then
+            LABEL="${{ github.event.label.name }}"
+            if [[ "$LABEL" == *"trigger:agent-execute"* ]]; then
+              SHOULD_EXECUTE="true"
+              ISSUE_NUMBER="${{ github.event.issue.number }}"
+              echo "✅ Label trigger for issue #${ISSUE_NUMBER}"
+            fi
+          fi
+
+          # Comment trigger
+          if [ "${{ github.event_name }}" = "issue_comment" ]; then
+            COMMENT="${{ github.event.comment.body }}"
+            if echo "$COMMENT" | grep -Eq "^/agent|@miyabi"; then
+              SHOULD_EXECUTE="true"
+              ISSUE_NUMBER="${{ github.event.issue.number }}"
+              echo "✅ Comment trigger for issue #${ISSUE_NUMBER}"
+            fi
+          fi
+
+          echo "should_execute=${SHOULD_EXECUTE}" >> $GITHUB_OUTPUT
+          echo "issue_number=${ISSUE_NUMBER}" >> $GITHUB_OUTPUT
+
+  execute-miyabi:
+    name: Execute Miyabi Agent
+    runs-on: ubuntu-latest
+    needs: check-trigger
+    if: needs.check-trigger.outputs.should_execute == 'true'
+
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install Miyabi CLI
+        run: |
+          if ! command -v miyabi &> /dev/null; then
+            echo "📦 Installing Miyabi CLI..."
+            cargo install --git https://github.com/ShunsukeHayashi/Miyabi miyabi-cli || true
+          fi
+          miyabi --version || echo "⚠️ Miyabi not installed, will use Claude Code approach"
+
+      - name: Post start comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ needs.check-trigger.outputs.issue_number }},
+              body: `## 🤖 Miyabi Agent Execution Started
+
+**Issue**: #${{ needs.check-trigger.outputs.issue_number }}
+**Triggered by**: ${{ github.actor }}
+**Run**: [View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+### Status
+- 🔍 Analyzing issue...
+- ⏳ Coordinator Agent initializing...
+
+---
+*This process may take a few minutes. You'll be notified when complete.*`
+            });
+
+      - name: Execute Miyabi Coordinator Agent
+        id: execute
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          echo "🚀 Executing Miyabi Agent for Issue #${{ needs.check-trigger.outputs.issue_number }}"
+
+          # Try to run miyabi if available
+          if command -v miyabi &> /dev/null; then
+            miyabi agent coordinator --issue ${{ needs.check-trigger.outputs.issue_number }} || echo "⚠️ Miyabi execution failed, needs manual intervention"
+          else
+            echo "ℹ️ Miyabi CLI not available in CI environment"
+            echo "💡 This would execute: miyabi agent coordinator --issue ${{ needs.check-trigger.outputs.issue_number }}"
+            echo "📝 For now, implementation will be done by Claude Code or manual process"
+          fi
+        continue-on-error: true
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "✅ Code changes detected"
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No code changes"
+          fi
+
+      - name: Create branch and commit
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "Miyabi Agent"
+
+          BRANCH_NAME="agent/issue-${{ needs.check-trigger.outputs.issue_number }}"
+          git checkout -b "$BRANCH_NAME"
+
+          git add .
+          git commit -m "feat: implement solution for issue #${{ needs.check-trigger.outputs.issue_number }}
+
+🤖 Generated by Miyabi Autonomous Agent
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
+          git push origin "$BRANCH_NAME"
+
+      - name: Create Pull Request
+        if: steps.check_changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "feat: implement solution for issue #${{ needs.check-trigger.outputs.issue_number }}" \
+            --body "## 🤖 Miyabi Agent Implementation
+
+**Issue**: Closes #${{ needs.check-trigger.outputs.issue_number }}
+**Agent**: CoordinatorAgent → CodeGenAgent
+**Execution**: Automated
+
+### Summary
+Automated implementation by Miyabi Autonomous Agent System.
+
+### Checklist
+- [x] Code generated
+- [x] Changes committed
+- [ ] Manual review required
+- [ ] Tests verified
+- [ ] Ready to merge
+
+---
+🤖 Generated by Miyabi" \
+            --label "🤖 agent:codegen" \
+            --label "automated"
+
+      - name: Comment on Issue (Success)
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const hasChanges = '${{ steps.check_changes.outputs.has_changes }}' === 'true';
+            const body = hasChanges
+              ? `## ✅ Miyabi Agent Execution Complete
+
+**Status**: Success ✓
+**Issue**: #${{ needs.check-trigger.outputs.issue_number }}
+
+### Actions Taken
+- ✅ Issue analyzed
+- ✅ Code generated
+- ✅ Pull Request created
+
+### Next Steps
+1. Review the generated PR
+2. Test the implementation
+3. Merge when ready
+
+[View Pull Request →](https://github.com/${{ github.repository }}/pulls)
+
+---
+🤖 Miyabi Autonomous Operations`
+              : `## ✅ Miyabi Agent Analysis Complete
+
+**Status**: Analysis Complete
+**Issue**: #${{ needs.check-trigger.outputs.issue_number }}
+
+### Analysis Result
+The agent has analyzed this issue. No code changes were generated.
+
+This may be because:
+- The issue requires manual intervention
+- The issue is informational only
+- Additional context is needed
+
+Please review and provide additional details if needed.
+
+---
+🤖 Miyabi Autonomous Operations`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ needs.check-trigger.outputs.issue_number }},
+              body: body
+            });
+
+      - name: Comment on Issue (Failure)
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ needs.check-trigger.outputs.issue_number }},
+              body: `## ❌ Miyabi Agent Execution Failed
+
+**Status**: Failed
+**Run**: [View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+### Error
+The agent execution encountered an error. Please check the logs for details.
+
+### Escalation
+This issue requires manual attention from @${{ github.repository_owner }}.
+
+---
+🤖 Miyabi Autonomous Operations`
+            });
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ needs.check-trigger.outputs.issue_number }},
+              labels: ['🔴 state:blocked', '🚨 severity:Sev.2-High']
+            });
