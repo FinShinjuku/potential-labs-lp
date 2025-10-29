@@ -1,21 +1,36 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Cloud, Music, Sparkles, Database } from "lucide-react"
+import { Cloud, Music, Sparkles, Database, Brain, Rocket, ArrowRight } from "lucide-react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 export function Services() {
-  const services = [
+  const mainServices = [
+    {
+      icon: Brain,
+      title: "AI開発",
+      description: "機械学習とAIテクノロジーを活用し、ビジネスの可能性を最大化します",
+      link: "/services/ai",
+      color: "from-blue-500 to-cyan-500"
+    },
     {
       icon: Cloud,
-      title: "AI、AWS、BytePlusを使った受託開発",
-      description: "最新のクラウドテクノロジーとAIを駆使し、お客様のビジネス課題を解決するカスタムソリューションを提供します。",
-      features: [
-        "AWS / BytePlus インフラ構築",
-        "AI/機械学習モデル開発",
-        "スケーラブルなアプリケーション開発",
-        "データパイプライン構築"
-      ]
+      title: "AWS開発",
+      description: "TAM経験を活かした、プロフェッショナルなクラウドソリューション",
+      link: "/services/aws",
+      color: "from-orange-500 to-red-500"
     },
+    {
+      icon: Rocket,
+      title: "BytePlus開発",
+      description: "TikTokを支える先進テクノロジーを活用した次世代プラットフォーム開発",
+      link: "/services/byteplus",
+      color: "from-purple-500 to-pink-500"
+    }
+  ]
+
+  const otherServices = [
     {
       icon: Music,
       title: "音楽の未来を変えるソリューション",
@@ -44,13 +59,40 @@ export function Services() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {services.map((service, index) => {
+        {/* Main Services */}
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
+          {mainServices.map((service, index) => {
             const Icon = service.icon
             return (
-              <Card key={index} className="border-2 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <Link key={index} href={service.link}>
+                <Card className="h-full border-2 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer group">
+                  <CardHeader>
+                    <div className={`h-12 w-12 rounded-lg bg-gradient-to-br ${service.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                      <Icon className="h-6 w-6 text-white" />
+                    </div>
+                    <CardTitle className="text-xl mb-2">{service.title}</CardTitle>
+                    <CardDescription className="text-base">{service.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition-all">
+                      <span>詳しく見る</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            )
+          })}
+        </div>
+
+        {/* Other Services */}
+        <div className="grid md:grid-cols-1 gap-8">
+          {otherServices.map((service, index) => {
+            const Icon = service.icon
+            return (
+              <Card key={index} className="border-2 hover:shadow-xl transition-all duration-300">
                 <CardHeader>
-                  <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-4">
+                  <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
                     <Icon className="h-6 w-6 text-white" />
                   </div>
                   <CardTitle className="text-2xl mb-2">{service.title}</CardTitle>
@@ -60,7 +102,7 @@ export function Services() {
                   <ul className="space-y-3">
                     {service.features.map((feature, i) => (
                       <li key={i} className="flex items-start">
-                        <Database className="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                        <Database className="h-5 w-5 text-purple-600 mr-3 mt-0.5 flex-shrink-0" />
                         <span className="text-slate-700">{feature}</span>
                       </li>
                     ))}
