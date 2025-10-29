@@ -79,16 +79,47 @@ export function About() {
                       Founder & CEO
                     </span>
                   </div>
-                  <h4 className="text-2xl font-bold mb-4">Kazuaki</h4>
+                  <h4 className="text-2xl font-bold mb-2">関原 一明</h4>
+                  <p className="text-slate-500 text-sm mb-4">Kazuaki Sekihara</p>
+
                   <p className="text-slate-600 leading-relaxed mb-4">
                     テクノロジーと人の可能性を信じ、Potential Labsを創業。
-                    クラウド、AI、音楽テクノロジーの分野で豊富な経験を持ち、
+                    クラウドインフラ、AI/機械学習、音楽テクノロジーの分野で10年以上の経験を持ち、
                     技術を通じて社会に新しい価値を生み出すことに情熱を注いでいます。
                   </p>
-                  <p className="text-slate-600 leading-relaxed">
+
+                  <p className="text-slate-600 leading-relaxed mb-4">
+                    これまでAWS、BytePlus等のクラウドプラットフォームを活用した
+                    大規模システムの設計・構築に従事。特にAI/機械学習を活用した
+                    データ駆動型ソリューションの開発において豊富な実績を持ちます。
+                  </p>
+
+                  <p className="text-slate-600 leading-relaxed mb-6">
                     「技術は手段であり、人の可能性を引き出すためのきっかけ」という信念のもと、
                     日々チームとともに革新的なソリューションの開発に取り組んでいます。
                   </p>
+
+                  <div className="border-t pt-4">
+                    <p className="text-sm font-semibold text-slate-700 mb-2">主な取引先・パートナー</p>
+                    <div className="flex flex-wrap gap-2">
+                      <a
+                        href="https://www.customercloudcorp.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm hover:bg-slate-200 transition-colors"
+                      >
+                        Customer Cloud Corp
+                      </a>
+                      <a
+                        href="https://www.propagateinc.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm hover:bg-slate-200 transition-colors"
+                      >
+                        Propagate Inc
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>

@@ -38,20 +38,36 @@ export function Hero() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-200">
           <Button
             size="lg"
-            className="group px-8 py-6 text-base"
+            className="group px-8 py-6 text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
             onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            お問い合わせ
+            無料で相談する
             <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Button>
           <Button
             size="lg"
             variant="outline"
-            className="px-8 py-6 text-base"
+            className="px-8 py-6 text-base border-2 hover:bg-slate-50"
             onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
           >
             サービスを見る
           </Button>
+        </div>
+
+        {/* Trust Indicators */}
+        <div className="mt-12 flex flex-wrap justify-center gap-6 text-sm text-slate-600 animate-fade-in-up animation-delay-400">
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+            <span>初回相談無料</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+            <span>実績多数</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+            <span>迅速対応</span>
+          </div>
         </div>
       </div>
     </section>
