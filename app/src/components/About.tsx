@@ -69,7 +69,7 @@ export function About() {
                     src="/images/founder.jpg"
                     alt="Founder"
                     fill
-                    className="object-cover"
+                    className="object-cover object-top"
                     priority
                   />
                 </div>
